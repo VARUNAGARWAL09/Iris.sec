@@ -9,10 +9,7 @@ class ThreatClassificationRequest(BaseModel):
     request_id: str | None = None
 
 class ThreatClassificationResponse(BaseModel):
-    threat_category: Literal[
-        "ransomware", "phishing", "exfiltration", "insider_threat", 
-        "malware", "credential_abuse", "lateral_movement", "botnet", "unknown"
-    ]
+    threat_category: str
     confidence: float = Field(ge=0.0, le=1.0)
     severity_prediction: Literal["info", "low", "medium", "high", "critical"]
     attack_complexity: Literal["low", "medium", "high"]

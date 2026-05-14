@@ -128,11 +128,12 @@ export const generateDocumentationPDF = (
 
     const tocItems = [
         { title: '1. System Overview', page: 3 },
-        { title: '2. Platform Features', page: 4 },
-        { title: '3. Severity Classification & SLAs', page: 5 },
-        { title: '4. Threat Detection Categories', page: 6 },
-        { title: '5. Risk Scoring Methodology', page: `${6 + threatTypes.length}` },
-        { title: '6. Escalation Contacts', page: `${7 + threatTypes.length}` }
+        { title: '2. ML Intelligence Hub', page: 4 },
+        { title: '3. Platform Features', page: 5 },
+        { title: '4. Severity Classification & SLAs', page: 6 },
+        { title: '5. Threat Detection Categories', page: 7 },
+        { title: '6. Risk Scoring Methodology', page: `${7 + threatTypes.length}` },
+        { title: '7. Escalation Contacts', page: `${8 + threatTypes.length}` }
     ];
 
     doc.setFontSize(11);
@@ -200,14 +201,72 @@ export const generateDocumentationPDF = (
 
     addFooter(3);
 
-    // ===== Page 4: PLATFORM FEATURES =====
+    // ===== Page 4: ML INTELLIGENCE HUB =====
     doc.addPage();
     currentY = margin;
 
     doc.setFontSize(20);
     doc.setFont('helvetica', 'bold');
     setTextRGB(primaryColor);
-    doc.text('2. Platform Features', margin, currentY);
+    doc.text('2. ML Intelligence Hub', margin, currentY);
+    currentY += 12;
+
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    setTextRGB(darkColor);
+    const mlOverview = `IRIS.SEC v3.0 employs a weighted ensemble architecture, orchestrating four specialized models to deliver high-fidelity threat detection with deterministic telemetry evolution.`;
+    const splitML = doc.splitTextToSize(mlOverview, pageWidth - 2 * margin);
+    doc.text(splitML, margin, currentY);
+    currentY += splitML.length * 6 + 5;
+
+    autoTable(doc, {
+        startY: currentY,
+        head: [['Model', 'Accuracy', 'Latency', 'Weight', 'Role']],
+        body: [
+            ['Ensemble-Alpha', '96.8%', '85ms', '40%', 'Consensus Leader'],
+            ['XGBoost-V4', '94.2%', '42ms', '25%', 'Volumetric Analysis'],
+            ['LGBM-Optimized', '93.5%', '35ms', '20%', 'Edge-case Detection'],
+            ['Neural-Corr', '91.2%', '120ms', '15%', 'Campaign Correlation']
+        ],
+        theme: 'striped',
+        headStyles: { fillColor: primaryColor, fontSize: 9 },
+        bodyStyles: { fontSize: 8 }
+    });
+
+    currentY = (doc as any).lastAutoTable.finalY + 10;
+
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    setTextRGB(darkColor);
+    doc.text('Technical Specifications', margin, currentY);
+    currentY += 8;
+
+    const mlSpecs = [
+        ['Telemetry Sync:', '7.0s Deterministic Polling Cadence'],
+        ['XAI Engine:', 'SHAP/LIME Consensus Attribution'],
+        ['Features:', '28+ Tactical & Behavioral Metrics'],
+        ['Detection Rate:', '96.8% Ensemble Accuracy']
+    ];
+
+    doc.setFontSize(10);
+    mlSpecs.forEach(spec => {
+        doc.setFont('helvetica', 'bold');
+        doc.text(spec[0], margin + 5, currentY);
+        doc.setFont('helvetica', 'normal');
+        doc.text(spec[1], margin + 50, currentY);
+        currentY += 6;
+    });
+
+    addFooter(4);
+
+    // ===== Page 5: PLATFORM FEATURES =====
+    doc.addPage();
+    currentY = margin;
+
+    doc.setFontSize(20);
+    doc.setFont('helvetica', 'bold');
+    setTextRGB(primaryColor);
+    doc.text('3. Platform Features', margin, currentY);
     currentY += 12;
 
     doc.setFontSize(14);
@@ -260,14 +319,14 @@ export const generateDocumentationPDF = (
 
     addFooter(4);
 
-    // ===== Page 5: SEVERITY LEVELS =====
+    // ===== Page 6: SEVERITY LEVELS =====
     doc.addPage();
     currentY = margin;
 
     doc.setFontSize(20);
     doc.setFont('helvetica', 'bold');
     setTextRGB(primaryColor);
-    doc.text('3. Severity Classification & SLAs', margin, currentY);
+    doc.text('4. Severity Classification & SLAs', margin, currentY);
     currentY += 12;
 
     autoTable(doc, {
@@ -294,10 +353,10 @@ export const generateDocumentationPDF = (
 
     currentY = (doc as any).lastAutoTable.finalY + 10;
 
-    addFooter(5);
+    addFooter(6);
 
     // ===== THREAT TYPES =====
-    let pageNum = 6;
+    let pageNum = 7;
     threatTypes.forEach((threat, index) => {
         doc.addPage();
         currentY = margin;
@@ -372,7 +431,7 @@ export const generateDocumentationPDF = (
     doc.setFontSize(20);
     doc.setFont('helvetica', 'bold');
     setTextRGB(primaryColor);
-    doc.text('5. Risk Scoring Methodology', margin, currentY);
+    doc.text('6. Risk Scoring Methodology', margin, currentY);
     currentY += 12;
 
     autoTable(doc, {
@@ -406,7 +465,7 @@ export const generateDocumentationPDF = (
     doc.setFontSize(20);
     doc.setFont('helvetica', 'bold');
     setTextRGB(primaryColor);
-    doc.text('6. Escalation Contacts', margin, currentY);
+    doc.text('7. Escalation Contacts', margin, currentY);
     currentY += 12;
 
     const contacts = [

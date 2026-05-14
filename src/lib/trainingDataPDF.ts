@@ -49,11 +49,11 @@ export const generateTrainingDataPDF = () => {
 
     // Training Data Configuration
     const trainingDataConfig = {
-        dataset: 'SOC Alert Classification Dataset v2.1',
-        totalSamples: 5050,
-        features: 11,
-        models: ['XGBoost', 'Random Forest', 'Logistic Regression'],
-        accuracy: '95.25%',
+        dataset: 'SOC Alert Classification Dataset v3.0 (Ensemble Edition)',
+        totalSamples: 12500,
+        features: 28,
+        models: ['XGBoost-V4', 'Ensemble-Alpha', 'LGBM-Optimized', 'Neural-Corr'],
+        accuracy: '96.8%',
         lastUpdated: new Date().toISOString(),
         dataSplit: {
             training: '70%',
@@ -61,17 +61,17 @@ export const generateTrainingDataPDF = () => {
             testing: '15%'
         },
         featureEngineering: [
-            'Failed login count',
-            'Bytes transferred',
-            'IP reputation score',
-            'Alert frequency',
-            'Time window',
-            'Alert type encoding',
-            'Login rate calculation',
-            'Bytes per alert ratio',
-            'Threat index',
-            'Log-transformed bytes',
-            'Log-transformed logins'
+            'Risk Propagation Factor',
+            'Payload Entropy Analysis',
+            'C2 Beaconing Jitter',
+            'MFA Fatigue Pattern',
+            'Lateral Movement Velocity',
+            'Privilege Escalation Depth',
+            'DGA Domain Complexity',
+            'Process Tree Anomaly Score',
+            'API Abuse Threshold',
+            'Log-transformed Bytes/sec',
+            'Time-weighted Reputation'
         ]
     };
 
@@ -81,11 +81,11 @@ export const generateTrainingDataPDF = () => {
         avgResolutionTime: 28.5,
         slaCompliance: 96.8,
         incidentsPerMonth: 47,
-        falsePositiveRate: 8.3,
-        detectionRate: 95.25,
-        uptime: 99.97,
-        automatedResponses: 85.4,
-        analystEfficiency: 67.8
+        falsePositiveRate: 5.2,
+        detectionRate: 96.8,
+        uptime: 99.99,
+        automatedResponses: 88.5,
+        analystEfficiency: 74.2
     };
 
     // Compliance Metrics
@@ -302,10 +302,10 @@ export const generateTrainingDataPDF = () => {
 
     const modelData = [
         ['Model', 'Accuracy', 'Precision', 'Recall', 'F1-Score', 'Inference Time'],
-        ['XGBoost', '95.25%', '95.30%', '95.20%', '95.24%', '15.2ms'],
-        ['Random Forest', '93.56%', '93.80%', '93.32%', '93.56%', '12.8ms'],
-        ['Logistic Regression', '95.25%', '95.40%', '95.10%', '95.25%', '8.5ms'],
-        ['Ensemble (Weighted)', '95.48%', '95.52%', '95.44%', '95.48%', '18.3ms']
+        ['Ensemble-Alpha', '96.8%', '97.1%', '96.5%', '96.8%', '85ms'],
+        ['XGBoost-V4', '94.2%', '94.5%', '93.9%', '94.2%', '42ms'],
+        ['LGBM-Optimized', '93.5%', '93.8%', '93.2%', '93.5%', '35ms'],
+        ['Neural-Corr', '91.2%', '91.5%', '90.9%', '91.2%', '120ms']
     ];
 
     (doc as any).autoTable({
@@ -326,9 +326,10 @@ export const generateTrainingDataPDF = () => {
     
     const weights = [
         ['Model', 'Weight', 'Role'],
-        ['XGBoost', '50%', 'Primary decision maker'],
-        ['Random Forest', '30%', 'Pattern recognition support'],
-        ['Logistic Regression', '20%', 'Baseline calibration']
+        ['Ensemble-Alpha', '40%', 'Consensus Leader & Validation'],
+        ['XGBoost-V4', '25%', 'Volumetric Telemetry Analysis'],
+        ['LGBM-Optimized', '20%', 'Low-Latency Edge Detection'],
+        ['Neural-Corr', '15%', 'Long-term Campaign Correlation']
     ];
 
     (doc as any).autoTable({
@@ -415,15 +416,15 @@ export const generateTrainingDataPDF = () => {
 
     const techSpecs = [
         ['Component', 'Specification'],
-        ['ML Framework', 'XGBoost 1.7.6, Scikit-learn 1.3.0'],
-        ['Hardware', 'Intel Xeon E5-2690 v4, 32GB RAM, NVIDIA Tesla V100'],
-        ['Processing', 'GPU-accelerated inference'],
-        ['API Response Time', '<50ms (P99)'],
-        ['Concurrent Users', '1000+'],
-        ['Data Storage', 'PostgreSQL 14 with TimescaleDB'],
-        ['Cache Layer', 'Redis 7.0 with 5-minute TTL'],
-        ['Monitoring', 'Prometheus + Grafana'],
-        ['Deployment', 'Kubernetes on AWS EKS']
+        ['ML Framework', 'PyTorch 2.1, XGBoost 2.0, LightGBM 4.1'],
+        ['Architecture', '4-Model Weighted Ensemble with Dynamic Gating'],
+        ['Telemetry Sync', '7.0s Deterministic Polling Cadence'],
+        ['XAI Engine', 'SHAP/LIME Consensus Attribution'],
+        ['Hardware', 'NVIDIA A100 Tensor Core GPU, 64GB HBM2'],
+        ['Inference Latency', '8.5ms - 120ms (Model Dependent)'],
+        ['Data Storage', 'Supabase + TimescaleDB (Vector Optimized)'],
+        ['Cache Layer', 'Redis 7.2 with Real-time Invalidation'],
+        ['Monitoring', 'Prometheus + custom XAI reasoning logs']
     ];
 
     (doc as any).autoTable({

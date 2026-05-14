@@ -30,7 +30,7 @@ export function useMLInference() {
     predictSLA: (payload: any) => performInference('predictSLA', payload),
     recognizeIntent: (query: string, context?: any) => performInference('recognizeIntent', query, context),
     correlateIncidents: (id: string, desc: string, hist: any[]) => performInference('correlateIncidents', id, desc, hist),
-    detectAnomalies: (id: string, type: string, feat: any, base: any[]) => performInference('detectAnomalies', id, type, feat, base),
+    detectAnomalies: (id: string, type: string, activity: string, feat: any, base: any[]) => performInference('detectAnomalies', id, type, activity, feat, base),
     predictMitre: (techs: string[]) => performInference('predictMitre', techs),
     classifyThreat: (title: string, desc: string) => performInference('classifyThreat', title, desc),
   };

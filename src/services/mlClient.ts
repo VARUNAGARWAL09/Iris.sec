@@ -3,7 +3,7 @@
  * Centralized client for interacting with the ML microservice.
  */
 
-const ML_SERVICE_URL = import.meta.env.VITE_ML_SERVICE_URL || 'http://localhost:8001';
+const ML_SERVICE_URL = import.meta.env.VITE_ML_SERVICE_URL || 'http://localhost:8000';
 
 export interface MLResponse<T> {
   success: boolean;
