@@ -1,0 +1,440 @@
+@import "@fontsource/jetbrains-mono/400.css";
+@import "@fontsource/jetbrains-mono/500.css";
+@import "@fontsource/jetbrains-mono/700.css";
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/500.css";
+@import "@fontsource/inter/600.css";
+@import "@fontsource/inter/700.css";
+@import './styles/performance.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* ── Core Surfaces ─────────────────────────────── */
+    --background:        222 47% 5%;
+    --foreground:        210 30% 94%;
+
+    --card:              222 40% 7%;
+    --card-foreground:   210 30% 94%;
+
+    --popover:           222 40% 8%;
+    --popover-foreground:210 30% 94%;
+
+    /* ── Cyber Green Primary ───────────────────────── */
+    --primary:           152 100% 48%;
+    --primary-foreground:222 47% 5%;
+
+    /* ── Panels & Secondary ────────────────────────── */
+    --secondary:         220 30% 13%;
+    --secondary-foreground: 210 30% 90%;
+
+    --muted:             220 30% 11%;
+    --muted-foreground:  215 18% 50%;
+
+    --accent:            220 30% 15%;
+    --accent-foreground: 210 30% 94%;
+
+    /* ── Alerts ────────────────────────────────────── */
+    --destructive:       0 80% 58%;
+    --destructive-foreground: 210 30% 98%;
+
+    --border:            220 25% 14%;
+    --input:             220 30% 12%;
+    --ring:              152 100% 48%;
+    --radius:            0.5rem;
+
+    /* ── Severity Tokens ───────────────────────────── */
+    --severity-critical: 0 80% 58%;
+    --severity-high:     25 92% 52%;
+    --severity-medium:   43 90% 50%;
+    --severity-low:      208 96% 54%;
+    --severity-info:     220 30% 48%;
+
+    /* ── Status Tokens ─────────────────────────────── */
+    --status-open:         152 100% 48%;
+    --status-investigating:43 90% 50%;
+    --status-contained:    208 96% 54%;
+    --status-resolved:     142 72% 38%;
+    --status-closed:       220 25% 38%;
+
+    /* ── Glow ──────────────────────────────────────── */
+    --glow-primary: 152 100% 48%;
+    --glow-danger:  0 80% 58%;
+    --glow-warning: 43 90% 50%;
+    --glow-blue:    208 96% 54%;
+
+    /* ── Glassmorphism Tokens ──────────────────────── */
+    --glass-bg:      222 40% 10% / 0.6;
+    --glass-border:  210 30% 94% / 0.07;
+    --glass-surface: 222 40% 12% / 0.45;
+
+    /* ── Sidebar ───────────────────────────────────── */
+    --sidebar-background:        222 50% 4%;
+    --sidebar-foreground:        210 25% 72%;
+    --sidebar-primary:           152 100% 48%;
+    --sidebar-primary-foreground:222 50% 4%;
+    --sidebar-accent:            220 30% 10%;
+    --sidebar-accent-foreground: 210 30% 94%;
+    --sidebar-border:            220 25% 11%;
+    --sidebar-ring:              152 100% 48%;
+  }
+
+  .light {
+    --background:        210 40% 98%;
+    --foreground:        222 47% 11%;
+    --card:              0 0% 100%;
+    --card-foreground:   222 47% 11%;
+    --popover:           0 0% 100%;
+    --popover-foreground:222 47% 11%;
+    --primary:           156 72% 35%;
+    --primary-foreground:0 0% 100%;
+    --secondary:         210 40% 94%;
+    --secondary-foreground:222 47% 11%;
+    --muted:             210 40% 96%;
+    --muted-foreground:  215 16% 47%;
+    --accent:            210 40% 92%;
+    --accent-foreground: 222 47% 11%;
+    --destructive:       0 84% 60%;
+    --destructive-foreground:0 0% 100%;
+    --border:            214 32% 85%;
+    --input:             214 32% 91%;
+    --ring:              156 72% 35%;
+    --severity-critical: 0 84% 50%;
+    --severity-high:     25 95% 45%;
+    --severity-medium:   45 93% 40%;
+    --severity-low:      210 100% 45%;
+    --severity-info:     217 33% 45%;
+    --status-open:       156 72% 35%;
+    --status-investigating:45 93% 40%;
+    --status-contained:  210 100% 45%;
+    --status-resolved:   142 76% 30%;
+    --status-closed:     217 33% 50%;
+    --sidebar-background:210 40% 96%;
+    --sidebar-foreground:222 47% 30%;
+    --sidebar-primary:   156 72% 35%;
+    --sidebar-primary-foreground:0 0% 100%;
+    --sidebar-accent:    210 40% 92%;
+    --sidebar-accent-foreground:222 47% 11%;
+    --sidebar-border:    214 32% 85%;
+    --sidebar-ring:      156 72% 35%;
+  }
+
+  .dark {
+    --background:        222 47% 5%;
+    --foreground:        210 30% 94%;
+    --card:              222 40% 7%;
+    --card-foreground:   210 30% 94%;
+    --popover:           222 40% 8%;
+    --popover-foreground:210 30% 94%;
+    --primary:           152 100% 48%;
+    --primary-foreground:222 47% 5%;
+    --secondary:         220 30% 13%;
+    --secondary-foreground:210 30% 90%;
+    --muted:             220 30% 11%;
+    --muted-foreground:  215 18% 50%;
+    --accent:            220 30% 15%;
+    --accent-foreground: 210 30% 94%;
+    --destructive:       0 80% 58%;
+    --destructive-foreground:210 30% 98%;
+    --border:            220 25% 14%;
+    --input:             220 30% 12%;
+    --ring:              152 100% 48%;
+    --sidebar-background:222 50% 4%;
+    --sidebar-foreground:210 25% 72%;
+    --sidebar-primary:   152 100% 48%;
+    --sidebar-primary-foreground:222 50% 4%;
+    --sidebar-accent:    220 30% 10%;
+    --sidebar-accent-foreground:210 30% 94%;
+    --sidebar-border:    220 25% 11%;
+    --sidebar-ring:      152 100% 48%;
+  }
+}
+
+@layer base {
+  * { @apply border-border; }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: "cv11", "ss01";
+  }
+
+  h1, h2, h3, h4, h5, h6 { @apply font-mono; }
+
+  /* Smooth scrollbars globally */
+  ::-webkit-scrollbar        { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track  { background: transparent; }
+  ::-webkit-scrollbar-thumb  { background: hsl(var(--border)); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: hsl(var(--muted-foreground)); }
+  * { scrollbar-width: thin; scrollbar-color: hsl(var(--border)) transparent; }
+}
+
+/* ══════════════════════════════════════════════
+   COMPONENTS — Glassmorphism & Tactical FX
+   ══════════════════════════════════════════════ */
+@layer components {
+
+  /* ── Glassmorphism Surfaces ─────────────────── */
+  .glass-card {
+    background: hsl(var(--glass-bg));
+    border: 1px solid hsl(var(--glass-border));
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .glass-surface {
+    background: hsl(var(--glass-surface));
+    border: 1px solid hsl(var(--glass-border));
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  /* ── Tactical Glow FX ───────────────────────── */
+  .glow-primary {
+    box-shadow: 0 0 0 1px hsl(var(--glow-primary)/0.2),
+                0 0 16px hsl(var(--glow-primary)/0.25),
+                0 0 40px hsl(var(--glow-primary)/0.08);
+  }
+
+  .glow-danger {
+    box-shadow: 0 0 0 1px hsl(var(--glow-danger)/0.2),
+                0 0 16px hsl(var(--glow-danger)/0.25),
+                0 0 40px hsl(var(--glow-danger)/0.08);
+  }
+
+  .glow-warning {
+    box-shadow: 0 0 0 1px hsl(var(--glow-warning)/0.2),
+                0 0 16px hsl(var(--glow-warning)/0.20),
+                0 0 40px hsl(var(--glow-warning)/0.06);
+  }
+
+  .glow-blue {
+    box-shadow: 0 0 0 1px hsl(var(--glow-blue)/0.2),
+                0 0 16px hsl(var(--glow-blue)/0.20),
+                0 0 40px hsl(var(--glow-blue)/0.06);
+  }
+
+  /* ── Cyber Grid Texture ─────────────────────── */
+  .cyber-grid {
+    background-image:
+      linear-gradient(hsl(var(--border)/0.25) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--border)/0.25) 1px, transparent 1px);
+    background-size: 36px 36px;
+  }
+
+  .cyber-grid-sm {
+    background-image:
+      linear-gradient(hsl(var(--border)/0.18) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--border)/0.18) 1px, transparent 1px);
+    background-size: 18px 18px;
+  }
+
+  /* ── Tactical Gradient Surfaces ─────────────── */
+  .tactical-surface {
+    background: linear-gradient(
+      135deg,
+      hsl(222 40% 8%) 0%,
+      hsl(220 35% 10%) 50%,
+      hsl(218 40% 8%) 100%
+    );
+  }
+
+  .tactical-surface-elevated {
+    background: linear-gradient(
+      135deg,
+      hsl(222 40% 10%) 0%,
+      hsl(220 35% 12%) 50%,
+      hsl(218 40% 10%) 100%
+    );
+  }
+
+  /* ── Command-center Terminal Text ───────────── */
+  .terminal-text {
+    @apply font-mono text-primary;
+    text-shadow: 0 0 8px hsl(var(--primary)/0.6),
+                 0 0 24px hsl(var(--primary)/0.2);
+  }
+
+  .terminal-text-sm {
+    @apply font-mono text-primary text-xs;
+    text-shadow: 0 0 6px hsl(var(--primary)/0.5);
+  }
+
+  /* ── Data Stripe Table Rows ─────────────────── */
+  .data-row {
+    @apply border-b border-border/40 transition-all duration-150;
+  }
+  .data-row:hover {
+    background: hsl(var(--accent)/0.4);
+    border-left: 2px solid hsl(var(--primary)/0.5);
+    padding-left: calc(theme(spacing.4) - 2px);
+  }
+
+  /* ── Live Status Indicator ──────────────────── */
+  .live-dot {
+    @apply relative inline-flex h-2 w-2 rounded-full bg-primary;
+  }
+  .live-dot::after {
+    content: '';
+    @apply absolute inset-0 rounded-full bg-primary;
+    animation: live-ping 1.6s cubic-bezier(0,0,0.2,1) infinite;
+  }
+
+  /* ── Severity Badge Variants ────────────────── */
+  .severity-critical {
+    @apply bg-[hsl(var(--severity-critical)/0.12)] text-[hsl(var(--severity-critical))] border-[hsl(var(--severity-critical)/0.3)];
+  }
+  .severity-high {
+    @apply bg-[hsl(var(--severity-high)/0.12)] text-[hsl(var(--severity-high))] border-[hsl(var(--severity-high)/0.3)];
+  }
+  .severity-medium {
+    @apply bg-[hsl(var(--severity-medium)/0.12)] text-[hsl(var(--severity-medium))] border-[hsl(var(--severity-medium)/0.3)];
+  }
+  .severity-low {
+    @apply bg-[hsl(var(--severity-low)/0.12)] text-[hsl(var(--severity-low))] border-[hsl(var(--severity-low)/0.3)];
+  }
+  .severity-info {
+    @apply bg-[hsl(var(--severity-info)/0.12)] text-[hsl(var(--severity-info))] border-[hsl(var(--severity-info)/0.3)];
+  }
+
+  /* ── Status Badge Variants ──────────────────── */
+  .status-open         { @apply bg-[hsl(var(--status-open)/0.12)] text-[hsl(var(--status-open))] border-[hsl(var(--status-open)/0.3)]; }
+  .status-investigating{ @apply bg-[hsl(var(--status-investigating)/0.12)] text-[hsl(var(--status-investigating))] border-[hsl(var(--status-investigating)/0.3)]; }
+  .status-contained    { @apply bg-[hsl(var(--status-contained)/0.12)] text-[hsl(var(--status-contained))] border-[hsl(var(--status-contained)/0.3)]; }
+  .status-resolved     { @apply bg-[hsl(var(--status-resolved)/0.12)] text-[hsl(var(--status-resolved))] border-[hsl(var(--status-resolved)/0.3)]; }
+  .status-closed       { @apply bg-[hsl(var(--status-closed)/0.12)] text-[hsl(var(--status-closed))] border-[hsl(var(--status-closed)/0.3)]; }
+
+  /* ── Scan Line Animation ────────────────────── */
+  .scanline::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    height: 2px;
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      hsl(var(--primary)/0.08),
+      transparent
+    );
+    animation: scanline 12s linear infinite;
+    pointer-events: none;
+  }
+
+  /* ── Card Hover Lift ────────────────────────── */
+  .card-lift {
+    @apply transition-all duration-200;
+  }
+  .card-lift:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 24px hsl(var(--primary)/0.08),
+                0 1px 6px hsl(0 0% 0% / 0.3);
+  }
+
+  /* ── Intel Badge ─────────────────────────────── */
+  .intel-badge {
+    @apply inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-mono font-semibold uppercase tracking-wide border;
+  }
+
+  /* ── Pulse Glow for Live Indicators ─────────── */
+  .pulse-indicator {
+    animation: pulse-glow 2.4s ease-in-out infinite;
+  }
+}
+
+/* ══════════════════════════════════════════════
+   KEYFRAMES
+   ══════════════════════════════════════════════ */
+@layer components {
+  @keyframes live-ping {
+    75%, 100% { transform: scale(2.2); opacity: 0; }
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% {
+      opacity: 1;
+      box-shadow: 0 0 6px hsl(var(--primary)/0.5);
+    }
+    50% {
+      opacity: 0.65;
+      box-shadow: 0 0 14px hsl(var(--primary)/0.8);
+    }
+  }
+
+  @keyframes scanline {
+    0%   { transform: translateY(-100%); }
+    100% { transform: translateY(100vh); }
+  }
+
+  @keyframes data-in {
+    from { opacity: 0; transform: translateX(-6px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .animate-data-in { animation: data-in 0.25s ease-out forwards; }
+  .animate-fade-up { animation: fade-up 0.3s ease-out forwards; }
+}
+
+/* ══════════════════════════════════════════════
+   UTILITIES
+   ══════════════════════════════════════════════ */
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar       { width: 5px; height: 5px; }
+  .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--border));
+    border-radius: 3px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--muted-foreground));
+  }
+
+  .text-severity-critical { color: hsl(var(--severity-critical)); }
+  .text-severity-high     { color: hsl(var(--severity-high)); }
+  .text-severity-medium   { color: hsl(var(--severity-medium)); }
+  .text-severity-low      { color: hsl(var(--severity-low)); }
+  .text-severity-info     { color: hsl(var(--severity-info)); }
+
+  .bg-severity-critical   { background-color: hsl(var(--severity-critical)); }
+  .bg-severity-high       { background-color: hsl(var(--severity-high)); }
+  .bg-severity-medium     { background-color: hsl(var(--severity-medium)); }
+  .bg-severity-low        { background-color: hsl(var(--severity-low)); }
+  .bg-severity-info       { background-color: hsl(var(--severity-info)); }
+
+  .border-severity-critical { border-color: hsl(var(--severity-critical)); }
+  .border-severity-high     { border-color: hsl(var(--severity-high)); }
+  .border-severity-medium   { border-color: hsl(var(--severity-medium)); }
+  .border-severity-low      { border-color: hsl(var(--severity-low)); }
+
+  .text-status-resolved     { color: hsl(var(--status-resolved)); }
+  .text-status-open         { color: hsl(var(--status-open)); }
+
+  /* Tactical gradient text */
+  .gradient-text-primary {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(180 80% 55%) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+/* ══════════════════════════════════════════════
+   PRINT
+   ══════════════════════════════════════════════ */
+@media print {
+  body { background: white !important; color: black !important; }
+  .print\:hidden { display: none !important; }
+  aside, nav, header { display: none !important; }
+  main { margin: 0 !important; padding: 20px !important; width: 100% !important; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+}

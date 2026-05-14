@@ -1,0 +1,49 @@
+name: Incident Commander Hub CI/CD
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install Frontend Dependencies
+      run: npm ci
+
+    - name: Type Check & Lint
+      run: npm run lint || npx tsc --noEmit
+
+    - name: Build Frontend
+      run: npm run build
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+
+    - name: Install ML Backend Dependencies
+      run: |
+        cd ml-service
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Check ML Backend Syntax
+      run: |
+        cd ml-service
+        python -m py_compile main.py
+        python -m py_compile auth.py
+        python -m py_compile retrain.py
