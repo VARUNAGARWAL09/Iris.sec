@@ -258,8 +258,16 @@ interface SimulationContextType {
   acknowledgeAlert: (id: string) => Promise<void>;
   resolveAlert: (id: string) => Promise<void>;
   escalateToIncident: (id: string) => Promise<string | null>;
+  addEvidence: (evidenceItem: {
+    type: 'file' | 'hash' | 'url' | 'ip' | 'domain' | 'email' | 'other';
+    value: string;
+    description: string | null;
+    classification: 'malicious' | 'suspicious' | 'benign' | 'unknown';
+    image_url: string | null;
+  }) => Promise<void>;
   avgResponseTime: string;
 }
+
 
 const SimulationContext = createContext<SimulationContextType | undefined>(undefined);
 
@@ -567,7 +575,7 @@ export function SimulationProvider({ children }: { children: ReactNode }) {
       : severity === 'high' ? 'suspicious'
         : 'unknown';
 
-    const { error: evidenceError } = await supabase
+    const { data: insertedEvidence, error: evidenceError } = await supabase
       .from('evidence')
       .insert({
         type: scenario.evidenceType,
@@ -575,10 +583,17 @@ export function SimulationProvider({ children }: { children: ReactNode }) {
         description: `Evidence collected from: ${scenario.source}`,
         classification: evidenceClassification,
         image_url: randomImage,
-      });
+      })
+      .select()
+      .single();
 
     if (evidenceError) {
       console.error('Error creating evidence:', evidenceError);
+    } else if (insertedEvidence) {
+      setEvidence(prev => {
+        if (prev.some(e => e.id === insertedEvidence.id)) return prev;
+        return [insertedEvidence as Evidence, ...prev];
+      });
     }
 
     // Sometimes also generate benign evidence (about 30% of the time)
@@ -588,7 +603,19 @@ export function SimulationProvider({ children }: { children: ReactNode }) {
       const benignImage = Math.random() < 0.4
         ? 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=300&fit=crop'
         : null;
-      await supabase.from('evidence').insert({ ...benignEvidence, image_url: benignImage });
+      
+      const { data: insertedBenign, error: benignError } = await supabase
+        .from('evidence')
+        .insert({ ...benignEvidence, image_url: benignImage })
+        .select()
+        .single();
+
+      if (!benignError && insertedBenign) {
+        setEvidence(prev => {
+          if (prev.some(e => e.id === insertedBenign.id)) return prev;
+          return [insertedBenign as Evidence, ...prev];
+        });
+      }
     }
 
     // Add notification based on analyzed severity
@@ -830,6 +857,34 @@ export function SimulationProvider({ children }: { children: ReactNode }) {
     return incidentData.id;
   };
 
+  const addEvidence = async (evidenceItem: {
+    type: 'file' | 'hash' | 'url' | 'ip' | 'domain' | 'email' | 'other';
+    value: string;
+    description: string | null;
+    classification: 'malicious' | 'suspicious' | 'benign' | 'unknown';
+    image_url: string | null;
+  }) => {
+    const { data, error } = await supabase
+      .from('evidence')
+      .insert({
+        ...evidenceItem,
+        added_by: user?.id || null
+      })
+      .select()
+      .single();
+
+    if (error) {
+      throw error;
+    }
+
+    if (data) {
+      setEvidence(prev => {
+        if (prev.some(e => e.id === data.id)) return prev;
+        return [data as Evidence, ...prev];
+      });
+    }
+  };
+
   return (
     <SimulationContext.Provider value={{
       isRunning,
@@ -841,6 +896,7 @@ export function SimulationProvider({ children }: { children: ReactNode }) {
       acknowledgeAlert,
       resolveAlert,
       escalateToIncident,
+      addEvidence,
       avgResponseTime: liveAvgResponseTime,
     }}>
       {children}

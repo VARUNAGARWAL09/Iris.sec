@@ -6,6 +6,7 @@ interface UseOptimizedDataOptions<T> {
   filterFn?: (item: T, filters: Record<string, any>) => boolean;
   sortFn?: (a: T, b: T) => number;
   pageSize?: number;
+  initialFilters?: Record<string, any>;
 }
 
 interface UseOptimizedDataResult<T> {
@@ -29,11 +30,12 @@ export function useOptimizedData<T>({
   searchFields,
   filterFn,
   sortFn,
-  pageSize = 50
+  pageSize = 50,
+  initialFilters
 }: UseOptimizedDataOptions<T>): UseOptimizedDataResult<T> {
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
-  const [filters, setFilters] = useState<Record<string, any>>({});
+  const [filters, setFilters] = useState<Record<string, any>>(initialFilters || {});
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);

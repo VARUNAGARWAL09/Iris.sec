@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useSimulation } from '@/context/SimulationContext';
 import type { EvidenceType } from '@/types/incident';
 
 type EvidenceClassification = 'malicious' | 'suspicious' | 'benign' | 'unknown';
@@ -28,6 +29,7 @@ interface UploadEvidenceDialogProps {
 }
 
 export function UploadEvidenceDialog({ trigger }: UploadEvidenceDialogProps) {
+  const { addEvidence } = useSimulation();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [type, setType] = useState<EvidenceType>('other');
@@ -89,16 +91,14 @@ export function UploadEvidenceDialog({ trigger }: UploadEvidenceDialogProps) {
         imageUrl = urlData.signedUrl;
       }
 
-      // Insert evidence record
-      const { error } = await supabase.from('evidence').insert({
+      // Insert evidence record using the SimulationContext for immediate local sync
+      await addEvidence({
         type,
         value: value.trim(),
         description: description.trim() || null,
         classification,
         image_url: imageUrl,
       });
-
-      if (error) throw error;
 
       toast({ title: 'Success', description: 'Evidence uploaded successfully' });
       setOpen(false);

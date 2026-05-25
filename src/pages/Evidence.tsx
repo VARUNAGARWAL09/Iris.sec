@@ -1,5 +1,5 @@
+import { useState, useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { useState, useMemo } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import {
   FileSearch,
@@ -65,20 +65,15 @@ const Evidence = () => {
   } = useOptimizedData({
     items: evidence,
     searchFields: ['value', 'description'],
-    filterFn: (evidence, filters) => {
-      const matchesType = filters.type === 'all' || evidence.type === filters.type;
-      const matchesClass = filters.classification === 'all' || evidence.classification === filters.classification;
+    filterFn: useCallback((evidence, filters) => {
+      const matchesType = !filters.type || filters.type === 'all' || evidence.type === filters.type;
+      const matchesClass = !filters.classification || filters.classification === 'all' || evidence.classification === filters.classification;
       return matchesType && matchesClass;
-    },
-    sortFn: (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
-    pageSize: 30
+    }, []),
+    sortFn: useCallback((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(), []), // Ascending here, hook negates to descending (newest first)
+    pageSize: 30,
+    initialFilters: { type: 'all', classification: 'all' }
   });
-
-  // Initialize filters
-  useMemo(() => {
-    setFilter('type', 'all');
-    setFilter('classification', 'all');
-  }, [setFilter]);
 
   const getTypeIcon = (type: EvidenceType) => {
     switch (type) {
