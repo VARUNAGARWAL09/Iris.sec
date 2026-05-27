@@ -308,18 +308,19 @@ The codebase is designed for easy upgrades:
 
 ## 📁 Files Created/Modified
 
-### Created (5 files):
+### Created (6 files):
 1. `src/types/logIngestion.ts` (72 lines)
 2. `src/utils/logParser.ts` (480 lines)
 3. `src/services/LogIngestionService.ts` (235 lines)
 4. `src/pages/LogIngestion.tsx` (645 lines)
 5. `LOG_INGESTION_README.md` (comprehensive docs)
+6. `ml-service/README.md` (comprehensive ML microservice docs)
 
 ### Modified (2 files):
 1. `src/App.tsx` (added 2 lines)
 2. `src/components/layout/Sidebar.tsx` (added 2 lines)
 
-**Total**: ~1,500 lines of production code + comprehensive documentation
+**Total**: ~1,500 lines of production React code + 15 FastAPI services/routers + comprehensive documentation
 
 ## 🎨 UI Preview
 
@@ -385,4 +386,4 @@ This implementation represents a **complete, enterprise-grade log ingestion syst
 **Documentation**: ⭐⭐⭐⭐⭐  
 **Architecture**: ⭐⭐⭐⭐⭐  
 
-Enjoy your new log ingestion capability! 🎉
+Enjoy the fully integrated IRIS.SEC Platform! 🎉

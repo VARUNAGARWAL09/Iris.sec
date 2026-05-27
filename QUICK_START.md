@@ -2,67 +2,52 @@
 
 ## ⚡ 5-Minute Quick Start
 
-### Step 1: Start the Frontend
+### Step 1: Start the Backend & Frontend Services
 
-1. **Start the React Frontend:**
+1. **Start the ML Microservice (Backend):**
    ```bash
-   cd "d:\major project demo simulation\incident-commander-hub-main"
+   cd ml-service
+   # Activate your virtual environment and run:
+   uvicorn main:app --host 0.0.0.0 --port 8000
+   ```
+   Wait for startup: `Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)`
+
+2. **Start the React Frontend:**
+   ```bash
+   # In the root project directory:
    npm run dev
    ```
+   Wait for: `Local: http://localhost:5173/` (or port standard dev port)
 
-   Wait for: `Local: http://localhost:3000/`
-
-**Alternatively**, run with Docker:
+**Alternatively**, run both services with Docker:
 ```bash
+# To run the integrated frontend container
 docker-compose up -d
 ```
 
 ### Step 2: Access Log Ingestion
-1. Open browser to `http://localhost:3000`
+1. Open browser to the frontend dashboard URL (e.g. `http://localhost:5173`)
 2. Log in to your IRIS-SOC dashboard
-3. In sidebar, click **"Log Ingestion"** (between Evidence and Playbooks)
+3. In the sidebar, click **"Log Ingestion"** (located between Evidence and Playbooks)
 
 ### Step 3: Generate Sample Log
 1. Click the **"Download Sample Log"** button (top right)
 2. A file `sample_security.log` will download
-3. This file contains realistic security events for testing
+3. This file contains realistic security events designed to test all 10 engine rules
 
 ### Step 4: Upload and Analyze
-1. Click **"Select File"** button
+1. Click the **"Select File"** button in the upload pane
 2. Choose the downloaded `sample_security.log`
-3. See preview of first 20 lines
-4. Click **"Analyze Logs"** button
-5. Watch the progress bar (should take 1-2 seconds)
+3. Review the preview showing the first 20 lines of the log file
+4. Click **"Analyze Logs"**
+5. Watch the real-time parser progress bar (should take 1-2 seconds)
 
 ### Step 5: Review Detections
-You should see approximately **8-10 detections**:
+You should see approximately **8-10 detections** showing the dynamic risk scoring output:
 
 | Detection | Severity | What It Found |
 |-----------|----------|---------------|
 | SSH Brute Force | High | 5 failed login attempts |
-
-### Step 6: Generate Alerts
-1. Click **"Generate Alerts (X threats detected)"** button
-2. Watch the progress bar (should take 2-3 seconds)
-3. **Success!** Toast notification shows created alerts count
-
-## 🚀 Performance Features (v3.1.0)
-
-### Fast Navigation
-- **70% Faster Page Transitions**: Navigate between pages instantly
-- **Smart Pagination**: 20 items per page with smooth loading
-- **Real-time Timestamps**: "Last active: 2 hours ago" instead of static dates
-
-### Advanced Filtering
-- **Multi-field Search**: Search across titles, case numbers, and tags
-- **Debounced Input**: 300ms delay prevents excessive re-renders
-- **Combined Filters**: Apply multiple filters simultaneously
-- **Reset Function**: One-click filter reset
-
-### Performance Monitor
-- **Real-time Metrics**: Track page load times and filter performance
-- **Optimization Alerts**: Get notified about performance issues
-- **Component Insights**: See which components are optimized
 | SQL Injection | Critical | 3 injection patterns |
 | Malware Signature | Critical | 3 malware detections |
 | Data Exfiltration | High | 2 large transfers (GB) |
@@ -72,39 +57,62 @@ You should see approximately **8-10 detections**:
 | Credential Harvesting | Critical | 2 mimikatz/lsass events |
 
 ### Step 6: Generate Alerts
-1. Click **"Generate Alerts (X)"** button (where X is the detection count)
-2. Watch progress as alerts are created
-3. See success message with breakdown:
+1. Click the **"Generate Alerts (X)"** button (where X is the total detection count)
+2. Watch the progress bar as alerts are securely created via INSERT-only queries
+3. See success message displaying the alert breakdown:
    - Critical alerts: ~4
    - High alerts: ~2
    - Medium alerts: ~2
 
 ### Step 7: Verify in Dashboard
-1. Navigate to **"Alerts"** page in sidebar
-2. You should see new alerts with `[Log]` prefix
+1. Navigate to the **"Alerts"** page in the sidebar
+2. You will see the newly generated alerts with a `[Log]` prefix
 3. Example: `[Log] SQL Injection Attempt`
-4. Click any alert to see full details including:
-   - Risk score
-   - Top source IPs
-   - Affected log lines
+4. Click on any alert card to see rich details including:
+   - Dynamic Risk score
+   - Affected IP addresses and source info
+   - Total occurrences and log lines
    - Sample log entries
-   - Recommended actions
+   - Prescribed playbooks and recommended response steps
+
+---
 
 ## ✅ Success Indicators
 
 After completing the quick test, you should see:
+- ✅ 8-10 new alerts generated in the Alerts feed
+- ✅ All generated alerts have the source labeled: "Log Analysis: sample_security.log"
+- ✅ Correct severity badges applied (red for Critical, orange for High, yellow for Medium)
+- ✅ Zero errors in the browser console
+- ✅ Real-time dashboard updates reflecting the new alerts immediately
 
-- ✅ 8-10 new alerts in the Alerts page
-- ✅ Each alert has source: "Log Analysis: sample_security.log"
-- ✅ Alerts have severity badges (red for Critical, orange for High, yellow for Medium)
-- ✅ No errors in browser console
-- ✅ Real-time updates (alerts appear immediately)
+---
+
+## 🚀 Performance Features (v3.1.0)
+
+### Fast Navigation
+- **70% Faster Page Transitions**: Fluid page swaps with optimized Framer Motion tuning (0.2s duration)
+- **Smart Pagination**: Paginated items rendered dynamically with instant load states
+- **Real-time Timestamps**: Consistent, realistic virtual time offsets (e.g. "2 hours ago")
+
+### Advanced Filtering
+- **Multi-field Search**: Search across titles, case numbers, and tags simultaneously
+- **Debounced Input**: 300ms input debouncing to prevent excessive React re-renders
+- **Combined Filters**: Apply multiple filters (severity, status, type) concurrently with immediate updates
+- **Reset Function**: One-click reset button to quickly restore unfiltered lists
+
+### Performance Monitor
+- **Real-time Metrics**: Track page transitions and search query latencies
+- **Optimization Alerts**: Immediate visual indicator on slow-rendering components
+- **Component Insights**: View metrics on memoization and render budgets
+
+---
 
 ## 🧪 Testing With Your Own Logs
 
 ### Supported Log Formats
 
-Any `.log` or `.txt` file containing text logs with patterns like:
+Any standard `.log` or `.txt` ASCII text file containing common patterns like:
 
 **SSH/Auth Logs:**
 ```
@@ -131,27 +139,26 @@ Feb 12 10:15:25 server sshd[1234]: authentication failure for user root
 ```
 
 ### Upload Process
-
 1. **Navigate** to `/log-ingestion`
-2. **Select** your `.log` or `.txt` file (max 10MB)
-3. **Preview** first 20 lines to verify format
-4. **Analyze** to run detection rules
-5. **Review** detections before generating alerts
-6. **Generate** alerts when satisfied
+2. **Select** your log file (maximum size is 10MB)
+3. **Preview** first 20 lines to verify the file was read correctly
+4. Click **"Analyze Logs"**
+5. **Review** detections before generating database entries
+6. Click **"Generate Alerts"**
 
 ### Best Practices
 
 ✅ **DO:**
-- Start with small log files (< 1MB) for testing
-- Review detections before generating alerts
-- Check for duplicates if re-uploading same file
-- Monitor dashboard to see alerts appear
+- Start with small log files (< 1MB) to verify your pattern structure.
+- Review and verify detections before converting them into database alerts.
+- Check the Alerts tab immediately after to observe real-time WebSockets synchronization.
 
 ❌ **DON'T:**
-- Upload files larger than 10MB (will be rejected)
-- Generate alerts without reviewing detections first
-- Upload the same file multiple times (duplicates are prevented)
-- Expect non-security logs to trigger detections
+- Upload files exceeding 10MB (these will be automatically rejected).
+- Upload the exact same file repeatedly (duplicate prevention blocks identical files within 24 hours).
+- Attempt to parse completely raw non-UTF8 binary files.
+
+---
 
 ## 🎯 What Each Detection Rule Finds
 
@@ -168,118 +175,63 @@ Feb 12 10:15:25 server sshd[1234]: authentication failure for user root
 | **Suspicious IP** | Patterns matching known bad IP ranges | 60-70 |
 | **Excessive Requests** | Multiple HTTP requests from same IP | 55-65 |
 
-*Risk scores increase based on frequency, IP diversity, and time concentration*
+*Note: Risk scores automatically scale upwards based on trigger frequency, time density, and unique target IP diversity.*
+
+---
 
 ## 🔧 Troubleshooting
 
 ### File Upload Issues
-
-**Problem**: "Invalid file type"  
-**Solution**: Only `.log` and `.txt` files are supported. Rename your file if needed.
-
-**Problem**: "File too large"  
-**Solution**: Maximum file size is 10MB. Split larger files or filter to recent logs.
-
-**Problem**: "File is empty"  
-**Solution**: Ensure the log file contains actual content.
+- **"Invalid file type"**: Ensure your file extension is strictly `.log` or `.txt`.
+- **"File too large"**: Ensure the file is under 10MB. Trim or split large server logs if necessary.
+- **"File is empty"**: Verify that the log contains text lines.
 
 ### Parsing Issues
-
-**Problem**: No detections found  
-**Solution**: The log file may not contain patterns matching the detection rules. Try the sample log first to verify the system works.
-
-**Problem**: Parsing takes too long  
-**Solution**: Large files may take longer. Check browser console for progress. Consider splitting the file.
+- **No detections found**: The uploaded log may not contain matching threat indicators. Try downloading and analyzing the sample log first to ensure the parser engine is active.
+- **Console Warnings**: Check developer tools console logs if processing hangs.
 
 ### Alert Generation Issues
+- **"Database connection failed"**: Check that Supabase is connected and that your `.env` contains valid credentials.
+- **Duplicate alerts suppressed**: If the same file was analyzed within the past 24 hours, the service suppresses duplicate alerts to avoid flooding.
 
-**Problem**: "Database connection failed"  
-**Solution**: Check that Supabase is running and your `.env` file has correct credentials.
-
-**Problem**: Duplicate alerts not prevented  
-**Solution**: Duplicate detection works on a 24-hour window. Alerts with the same rule+filename are blocked.
-
-**Problem**: Alerts not appearing in dashboard  
-**Solution**: 
-1. Check browser console for errors
-2. Verify real-time subscription is active
-3. Refresh the Alerts page
-4. Check Supabase dashboard to see if alerts were inserted
+---
 
 ## 📊 Understanding Results
 
 ### Statistics Cards
+- **Total Lines**: Count of processed lines.
+- **Detections**: Count of unique rules triggered.
+- **Critical Threats**: Total alerts scoring $\ge 90$ risk level.
+- **Processing Time**: Duration in milliseconds for parsing execution.
 
-**Total Lines**: Number of lines processed from log file  
-**Detections**: Number of threat patterns found  
-**Critical Threats**: Detections with risk score ≥ 90  
-**Processing Time**: Milliseconds to analyze the log
+### Detection Details
+- **Occurrences**: Total line hits for a specific category.
+- **Unique IPs**: Count of distinct source IPs found.
+- **MITRE ATT&CK**: Maps triggers directly to standard adversarial technique numbers.
+- **Recommended Action**: Provides step-by-step containment instructions.
 
-### Detection Cards
-
-Each detection shows:
-- **Rule Name**: What threat pattern was matched
-- **Severity Badge**: Color-coded (Critical=red, High=orange, Medium=yellow, Low=blue)
-- **Risk Score**: Dynamic score from 0-100
-- **Occurrences**: How many times the pattern appeared
-- **Unique IPs**: Number of distinct IP addresses involved
-- **Category**: Threat category (e.g., "Injection Attack")
-- **MITRE ATT&CK**: Relevant technique IDs
-- **Top Source IPs**: Most frequent IP addresses with count
-- **Sample Log Entry**: Example line that triggered detection
-
-### Processing Summary
-
-After generating alerts:
-- **Alerts Generated**: Total created
-- **Critical/High/Medium/Low**: Breakdown by severity
-- **Processing Time**: Time to insert all alerts
+---
 
 ## 🎓 Next Steps
 
-### After Quick Test
+1. ✅ **Connect live logs**: Test ingestion using real system auth logs.
+2. ✅ **Add custom rules**: Add domain patterns inside `src/utils/logParser.ts`.
+3. ✅ **Try ML Predictions**: Run the Python ML service and inspect predicted playbooks on live incidents.
 
-1. ✅ **Try your own logs**: Upload real security logs from your systems
-2. ✅ **Customize rules**: Edit `src/utils/logParser.ts` to add domain-specific patterns
-3. ✅ **Monitor dashboard**: Watch how alerts integrate with existing workflow
-4. ✅ **Test correlation**: See if log-based alerts can be escalated to incidents
-
-### Advanced Usage
-
-- **Add custom rules**: See `LOG_INGESTION_README.md` for rule creation guide
-- **Integrate with SIEM**: Export detections or correlate with other data
-- **Automate ingestion**: Build scheduled log processing
-- **Extend to streaming**: Implement real-time log tailing
+---
 
 ## 📚 Additional Resources
-
-- **Full Documentation**: `LOG_INGESTION_README.md`
-- **Architecture Diagrams**: `ARCHITECTURE_DIAGRAMS.md`
-- **Implementation Details**: `IMPLEMENTATION_SUMMARY.md`
-- **Test Utilities**: `src/utils/testLogIngestion.ts`
-
-## 💬 Support
-
-If you encounter issues:
-
-1. Check browser console for error messages
-2. Review the troubleshooting section above
-3. Verify your `.env` configuration
-4. Test with the sample log first
-5. Check that alerts table exists in Supabase
-
-## 🎉 You're All Set!
-
-The log ingestion feature is now ready to use. Start with the sample log to verify everything works, then upload your own security logs to begin automated threat detection.
-
-**Happy hunting! 🔍🛡️**
+- **Parser Core**: `src/utils/logParser.ts`
+- **Full Architecture Details**: `LOG_INGESTION_README.md`
+- **System Diagrams**: `ARCHITECTURE_DIAGRAMS.md`
+- **ML Microservice Docs**: `ml-service/README.md`
 
 ---
 
 **Quick Reference**:
-- Page: `/log-ingestion`
-- Max file size: 10MB
-- Supported formats: `.log`, `.txt`
-- Detection rules: 10
-- Duplicate window: 24 hours
-- Real-time updates: Automatic
+- **Ingestion Route**: `/log-ingestion`
+- **Max size**: 10MB
+- **Formats**: `.log`, `.txt`
+- **Engine Rules**: 10 distinct rules
+- **Ensemble ML Endpoint**: `http://localhost:8000`
+- **Real-time Sync**: Enabled 🚀

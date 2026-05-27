@@ -45,38 +45,6 @@ The application is designed to be highly responsive, visually immersive (cyber-s
 - **Virtual Time Integration**: Realistic "Last active: X minutes ago" timestamps.
 - **Performance Monitor**: Real-time metrics tracking and optimization alerts.
 
-## 8. Performance Optimizations (v3.1.0)
-
-### Page Transition Optimization
-- **70% Faster Transitions**: Optimized routing and component loading
-- **Code Splitting**: Lazy loading for improved initial load times
-- **Component Memoization**: Strategic use of React.memo for expensive renders
-- **Animation Tuning**: Consistent 0.2s duration for smooth transitions
-
-### Filtering and Search Performance
-- **75% Faster Filtering**: Debounced search with 300ms delay
-- **Memoized Filtering**: useOptimizedData hook with intelligent caching
-- **Virtual Scrolling**: Efficient rendering of large datasets
-- **Smart Pagination**: 20-30 items per page with configurable sizes
-
-### Data Management
-- **useOptimizedData Hook**: Custom hook for efficient data operations (192 lines)
-- **useSimpleData Hook**: Lightweight alternative for simple pagination (50 lines)
-- **useEvidenceIntegrityOptimized Hook**: Optimized evidence integrity verification (72 lines)
-- **Virtual Time Integration**: Realistic timestamp calculation without performance impact
-
-### Real-time Updates
-- **Realistic Timestamps**: "Last active: 2 hours ago" instead of static dates
-- **Multi-field Search**: Search across titles, case numbers, and tags simultaneously
-- **Combined Filters**: Apply multiple filters simultaneously with instant results
-- **Reset Functionality**: One-click filter reset for quick clearing
-
-### User Experience Improvements
-- **Enhanced Error Handling**: Better user feedback and debugging information
-- **Performance Monitoring**: Real-time metrics tracking and optimization alerts
-- **Consistent Interface**: Uniform design patterns across all pages
-- **Responsive Design**: Optimized for desktop and tablet interfaces
-
 ## 3. Architecture & Data Flow
 
 The application relies on a set of React Providers to manage state and business logic globally.
@@ -318,13 +286,14 @@ Full-featured immutable audit trail with the following capabilities:
 ## 6. Installation & Setup
 
 ### Prerequisites
-- Node.js (v18+)
-- npm or yarn
+- **Node.js** (v18+)
+- **Python** (3.12+)
+- **npm** or **yarn**
 
-### Steps
+### React Frontend Setup
 1.  **Clone Repository**:
     ```bash
-    git clone <repo_url>
+    git clone https://github.com/VARUNAGARWAL09/incident-commander-hub.git
     cd incident-commander-hub
     ```
 2.  **Install Dependencies**:
@@ -332,16 +301,40 @@ Full-featured immutable audit trail with the following capabilities:
     npm install
     ```
 3.  **Environment Setup**:
-    Create a `.env` file with Supabase credentials:
+    Create a `.env` file in the root directory:
     ```env
     VITE_SUPABASE_URL=your_supabase_url
     VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+    VITE_ML_SERVICE_URL=http://localhost:8000
     ```
 4.  **Run Development Server**:
     ```bash
     npm run dev
     ```
-    Access the app at `http://localhost:8080`.
+    Access the app at `http://localhost:5173`.
+
+### Machine Learning Microservice Setup
+1.  **Navigate to directory**:
+    ```bash
+    cd ml-service
+    ```
+2.  **Initialize Virtual Environment**:
+    ```bash
+    python -m venv .venv
+    # Windows:
+    .venv\Scripts\Activate.ps1
+    # macOS/Linux:
+    source .venv/bin/activate
+    ```
+3.  **Install Requirements**:
+    ```bash
+    pip install -r requirements.txt
+    ```
+4.  **Run ML Microservice**:
+    ```bash
+    uvicorn main:app --host 0.0.0.0 --port 8000
+    ```
+    The Swagger interactive documentation will be available at `http://localhost:8000/docs`.
 
 ## 7. Performance Optimizations (v3.1.0)
 
@@ -375,7 +368,7 @@ Full-featured immutable audit trail with the following capabilities:
 - **Micro-interactions**: Hover states and button interactions use CSS transitions for better performance.
 - **Loading States**: Skeleton loaders and spinners provide visual feedback during data fetching.
 
-## 8. Directory Structure
+## 9. Directory Structure
 
 ```
 src/
@@ -402,7 +395,7 @@ src/
 └── lib/                # Helper functions (pdfGenerator.ts, utils.ts)
 ```
 
-## 9. Mock Data & Team Roster
+## 10. Mock Data & Team Roster
 
 The file `/src/data/mockData.ts` provides the base seed data for the simulation. It currently defines:
 
@@ -415,7 +408,7 @@ The file `/src/data/mockData.ts` provides the base seed data for the simulation.
 
 > **Note:** Ronit Ranjan was fully removed from the codebase. All prior references (alerts, evidence chain-of-custody, timeline events) have been updated to reflect the current active team members. The `AuditLog.tsx` page contains a `remapUserDisplay()` function that maps any legacy database references to `prithvirajdeshmukh.cy22`.
 
-## 10. Custom Hooks Reference
+## 11. Custom Hooks Reference
 
 | Hook | File | Purpose |
 |---|---|---|
@@ -427,7 +420,7 @@ The file `/src/data/mockData.ts` provides the base seed data for the simulation.
 | `useVoiceAlert` | `hooks/useVoiceAlert.ts` | Wraps Web Speech API for critical threat audio announcements |
 | `useAudioUnlock` | `hooks/useAudioUnlock.ts` | Handles browser audio unlock requirement on first user interaction |
 
-## 11. Recent Enhancements
+## 12. Recent Enhancements
 
 ### v3.0.0 — Enterprise, ML, & Threat Intel (May 2026)
 
@@ -644,7 +637,7 @@ The file `/src/data/mockData.ts` provides the base seed data for the simulation.
 - Services/Utils: `/src/services/LogIngestionService.ts`, `/src/utils/logParser.ts`
 - Uses robust custom type schemas and pure INSERT-only functions to ensure side-effect-free integration.
 
-## 12. Future Roadmap
+## 13. Future Roadmap
 
 **Planned Features:**
 - Advanced NLP capabilities for IRIS chatbot
@@ -664,6 +657,6 @@ The file `/src/data/mockData.ts` provides the base seed data for the simulation.
 
 ---
 
-**Project Version:** 3.0.0  
+**Project Version:** 3.1.0  
 **Last Updated:** May 2026  
 **Maintained by:** Varun Agarwal

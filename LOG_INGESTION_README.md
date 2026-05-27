@@ -368,6 +368,6 @@ For issues or questions:
 
 ---
 
-**Version**: 1.0.0  
-**Last Updated**: 2024-02-12  
+**Version**: 3.1.0  
+**Last Updated**: May 2026  
 **Author**: IRIS-SOC Development Team

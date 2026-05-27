@@ -12,12 +12,12 @@ graph TB
         E --> F[Performance Monitor]
     end
     
-    subgraph "Performance Layer v3.1.0"
+    subgraph "Performance & Client Layer v3.1.0"
         G[useOptimizedData Hook] --> H[Debounced Search]
         G --> I[Memoized Filtering]
         G --> J[Smart Pagination]
         K[useSimpleData Hook] --> L[Lightweight Pagination]
-        M[Performance Monitor] --> N[Real-time Metrics]
+        M[mlClient Broker] --> N[High-Fidelity Mocks Fallback]
     end
     
     subgraph "State Management"
@@ -32,6 +32,11 @@ graph TB
         W --> Y[Realtime Subscriptions]
         W --> Z[Row Level Security]
     end
+
+    subgraph "Machine Learning Microservice"
+        ML[FastAPI App] --> MLR[11 Routers: Risk/SLA/UEBA/MITRE...]
+        MLR --> MLS[Dynamic Inference & Calibration Engine]
+    end
     
     A --> O
     A --> Q
@@ -39,11 +44,47 @@ graph TB
     A --> U
     E --> G
     E --> K
-    E --> M
+    C --> M
+    M -->|HTTP API Port 8000| ML
     O --> W
     Q --> W
     S --> W
     U --> W
+```
+
+## ML Inference & High-Fidelity Local Fallback Flow
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Analyst as Security Analyst
+    participant UI as React UI Component
+    participant Client as mlClient Broker
+    participant API as FastAPI ML Microservice
+    participant Local as High-Fidelity Local Fallback
+
+    Analyst->>UI: Triggers ML Feature (e.g. Risk check, NLP query)
+    UI->>Client: Request Inference (payload)
+    activate Client
+    Client->>API: HTTP POST /endpoint (payload)
+    activate API
+    
+    alt ML Service is Online
+        API-->>Client: Returns MLResponse (data, metadata, latency)
+        deactivate API
+        Client-->>UI: Returns processed data
+    else ML Service is Offline / Network Timeout
+        Client->>Client: Captures network exception
+        Client->>Local: Triggers fallback router
+        activate Local
+        Local->>Local: Computes realistic high-fidelity fallback response
+        Local-->>Client: Returns fallback simulation payload
+        deactivate Local
+        Client-->>UI: Returns fallback data (with warning log)
+    end
+    
+    deactivate Client
+    UI-->>Analyst: Renders dynamic charts & dashboard metrics instantly
 ```
 
 ## Performance Optimization Architecture

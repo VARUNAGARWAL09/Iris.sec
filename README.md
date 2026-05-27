@@ -19,6 +19,12 @@ IRIS.SEC (Incident Response & Intelligence System - Security Operations Center) 
 - Contextual help and smart suggestions
 - Search incidents by keywords, severity, or status
 
+### 🧠 **Enterprise ML Intelligence**
+- **Adaptive Risk Engine:** Ensemble predictions (XGBoost, LightGBM, heuristics) determining incident threat scores
+- **SLA Forecasting:** Regression analysis predicting MTTR and breach probability based on analyst queues
+- **UEBA & Anomalies:** Statistical behavior profiling with geographic travel velocity validation (impossible travel)
+- **High-Fidelity Offline Resilience:** Automated client-side high-fidelity fallbacks ensuring UI continuity when ML service is offline
+
 ### 🏢 **Enterprise Ready**
 - **Multi-Tenancy:** Hardened Row-Level Security for organization isolation
 - **RBAC:** Strict Role-Based Access Control (Admin, Analyst, Viewer)
@@ -167,16 +173,22 @@ The production-ready files will be in the `dist/` directory.
 - **Recharts** - Data visualization
 - **Lucide React** - Icon library
 
-### Backend & Data
-- **Supabase** - Backend-as-a-Service
-- **PostgreSQL** - Database
-- **Row Level Security (RLS)** - Data access policies
-- **Realtime subscriptions** - Live updates via WebSocket
+### Backend & Data Services
+- **Supabase** - Backend-as-a-Service (Auth, Database, Edge Functions)
+- **PostgreSQL** - Database with Row-Level Security (RLS)
+- **Realtime subscriptions** - Live WebSocket notifications
+
+### Machine Learning Microservice
+- **FastAPI** - High-performance modular Python web server
+- **scikit-learn** - Classification and Calibration algorithms
+- **XGBoost & LightGBM** - Gradient boosting ensemble algorithms
+- **Sentence-Transformers** - Advanced text embeddings extraction
+- **Pydantic v2** - Type enforcement and payload contracts
 
 ### Additional Libraries
-- **jsPDF** + **jsPDF-AutoTable** - PDF generation
+- **jsPDF** + **jsPDF-AutoTable** - Professional PDF generation
 - **date-fns** - Date formatting
-- **React Router** - Navigation (via Tanstack Router)
+- **React Router** - Navigation (via React Router DOM)
 
 ## 📖 Usage Guide
 
