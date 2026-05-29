@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { useState, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import {
   AlertTriangle,
   Check,
@@ -28,7 +28,6 @@ import { useSimulation } from '@/context/SimulationContext';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import type { Severity } from '@/types/incident';
-import { useOptimizedData } from '@/hooks/useOptimizedData';
 
 const Alerts = () => {
   const { alerts, acknowledgeAlert, resolveAlert, escalateToIncident } = useSimulation();
@@ -37,44 +36,48 @@ const Alerts = () => {
   const [activeTab, setActiveTab] = useState('all');
   const [selectedAlerts, setSelectedAlerts] = useState<string[]>([]);
   const [escalatingId, setEscalatingId] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [severityFilter, setSeverityFilter] = useState<Severity | 'all'>('all');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 25;
 
-  const {
-    paginatedItems,
-    searchTerm,
-    setSearchTerm,
-    filters,
-    setFilter,
-    sortOrder,
-    setSortOrder,
-    currentPage,
-    setCurrentPage,
-    totalPages,
-    loading: dataLoading,
-    debouncedSearchTerm
-  } = useOptimizedData({
-    items: alerts,
-    searchFields: ['title', 'source'],
-    filterFn: (alert, filters) => {
-      const matchesSeverity = filters.severity === 'all' || alert.severity === filters.severity;
-      const matchesTab = activeTab === 'all' ||
-        (activeTab === 'pending' && alert.status === 'pending') ||
-        (activeTab === 'acknowledged' && alert.status === 'acknowledged') ||
-        (activeTab === 'resolved' && alert.status === 'resolved');
+  const filteredItems = useMemo(() => {
+    const normalizedSearch = searchTerm.trim().toLowerCase();
 
-      return matchesSeverity && matchesTab;
-    },
-    sortFn: (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
-    pageSize: 25
-  });
+    return alerts
+      .filter((alert) => {
+        const matchesSearch =
+          normalizedSearch === '' ||
+          alert.title.toLowerCase().includes(normalizedSearch) ||
+          alert.source.toLowerCase().includes(normalizedSearch);
+        const matchesSeverity = severityFilter === 'all' || alert.severity === severityFilter;
+        const matchesStatus = activeTab === 'all' || alert.status === activeTab;
 
-  // Initialize filters
-  useMemo(() => {
-    setFilter('severity', 'all');
-  }, [setFilter]);
+        return matchesSearch && matchesSeverity && matchesStatus;
+      })
+      .sort((a, b) => {
+        const order = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+        return sortOrder === 'desc' ? -order : order;
+      });
+  }, [activeTab, alerts, searchTerm, severityFilter, sortOrder]);
+
+  const totalPages = Math.ceil(filteredItems.length / pageSize);
+  const paginatedItems = filteredItems.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const pendingCount = alerts.filter(a => a.status === 'pending').length;
   const acknowledgedCount = alerts.filter(a => a.status === 'acknowledged').length;
   const resolvedCount = alerts.filter(a => a.status === 'resolved').length;
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    setCurrentPage(1);
+  };
+
+  const handleToggleSort = () => {
+    setSortOrder(sortOrder === 'desc' ? 'asc' : 'desc');
+    setCurrentPage(1);
+  };
 
   const handleAcknowledgeSelected = async () => {
     const pendingSelected = selectedAlerts.filter(id => {
@@ -180,7 +183,7 @@ const Alerts = () => {
         </div>
 
         {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <Tabs value={activeTab} onValueChange={handleTabChange}>
           <div className="flex flex-wrap items-center gap-4">
             <TabsList className="bg-secondary/50">
               <TabsTrigger value="all" className="gap-2">
@@ -226,14 +229,20 @@ const Alerts = () => {
               <Input
                 placeholder="Search alerts..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setCurrentPage(1);
+                }}
                 className="pl-9 bg-secondary/50"
               />
             </div>
 
             <Select
-              value={filters.severity || 'all'}
-              onValueChange={(value) => setFilter('severity', value as Severity | 'all')}
+              value={severityFilter}
+              onValueChange={(value) => {
+                setSeverityFilter(value as Severity | 'all');
+                setCurrentPage(1);
+              }}
             >
               <SelectTrigger className="w-[140px] bg-secondary/50">
                 <SelectValue placeholder="Severity" />
@@ -247,7 +256,13 @@ const Alerts = () => {
               </SelectContent>
             </Select>
 
-            <Button variant="outline" size="icon">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleToggleSort}
+              title={`Sort ${sortOrder === 'desc' ? 'oldest first' : 'newest first'}`}
+              aria-label={`Sort ${sortOrder === 'desc' ? 'oldest first' : 'newest first'}`}
+            >
               <ArrowUpDown className="h-4 w-4" />
             </Button>
           </motion.div>
@@ -256,7 +271,12 @@ const Alerts = () => {
           <div className="flex items-center justify-between text-sm text-muted-foreground mt-4">
             <p>
               Showing <span className="font-semibold text-foreground">{paginatedItems.length}</span> of{' '}
-              <span className="font-semibold text-foreground">{alerts.length}</span> alerts
+              <span className="font-semibold text-foreground">{filteredItems.length}</span> alerts
+              {filteredItems.length !== alerts.length && (
+                <span className="ml-2">
+                  (filtered from {alerts.length} total)
+                </span>
+              )}
               {totalPages > 1 && (
                 <span className="ml-2">
                   (Page {currentPage} of {totalPages})

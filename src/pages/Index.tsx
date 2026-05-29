@@ -435,7 +435,7 @@ const Index = () => {
                         {tactics.length} active
                       </span>
                     </div>
-                    <Button variant="ghost" size="sm" className="gap-1 text-xs" onClick={() => navigate('/mitre-attack')}>
+                    <Button variant="ghost" size="sm" className="gap-1 text-xs" onClick={() => navigate('/mitre')}>
                       Full Matrix <ArrowUpRight className="h-3 w-3" />
                     </Button>
                   </div>
