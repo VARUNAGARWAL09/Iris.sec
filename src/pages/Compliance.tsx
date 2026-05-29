@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import { useIncidents } from '@/context/IncidentsContext';
+import { useSimulation } from '@/context/SimulationContext';
 import {
     Shield,
     FileCheck2,
@@ -52,9 +53,6 @@ import { PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis, CartesianGrid, Tool
 import {
     getNistAlignment,
     getIsoControls,
-    calculateSlaMetrics,
-    calculateResolutionMetrics,
-    calculateTrendData,
     formatMinutes,
 } from '@/lib/complianceService';
 import { generateCompliancePDF } from '@/lib/compliancePDFGenerator';
@@ -69,210 +67,124 @@ const COLORS = {
     info: '#3b82f6',
 };
 
-// Realistic compliance metrics
-const REALISTIC_METRICS = {
-    overallCompliance: 94.7,
-    nistAlignment: 96.2,
-    iso27001Score: 92.8,
-    gdprCompliance: 98.1,
-    hipaaCompliance: 95.4,
-    soxCompliance: 93.7,
-    pciDssCompliance: 97.2,
-    avgResponseTime: 4.2, // minutes
-    avgResolutionTime: 28.5, // minutes
-    slaCompliance: 96.8,
-    incidentsPerMonth: 47,
-    falsePositiveRate: 8.3,
-    detectionRate: 95.25,
-    uptime: 99.97,
-    auditFindings: 3,
-    criticalAssets: 1247,
-    userAccounts: 5428,
-    dataProcessed: 12400000, // GB per year
-    alertsProcessed: 1560000, // per year
-    automatedResponses: 85.4, // percentage
-    analystEfficiency: 67.8, // percentage improvement
-};
+const getDayKey = (date: Date) => date.toISOString().split('T')[0];
+const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+
+const getVirtualWave = (seed: number, amplitude: number) => Math.sin(seed) * amplitude;
 
 export default function Compliance() {
     const { incidents } = useIncidents();
+    const { alerts, evidence, virtualTime } = useSimulation();
 
-    // Realistic compliance metrics
-    const complianceMetrics = useMemo(() => ({
-        overall: REALISTIC_METRICS.overallCompliance,
-        nist: REALISTIC_METRICS.nistAlignment,
-        iso27001: REALISTIC_METRICS.iso27001Score,
-        gdpr: REALISTIC_METRICS.gdprCompliance,
-        hipaa: REALISTIC_METRICS.hipaaCompliance,
-        sox: REALISTIC_METRICS.soxCompliance,
-        pciDss: REALISTIC_METRICS.pciDssCompliance,
-    }), []);
+    const virtualMetrics = useMemo(() => {
+        const minuteSeed = Math.floor(virtualTime.getTime() / 60000);
+        const hourSeed = Math.floor(virtualTime.getTime() / 3600000);
+        const alertPressure = clamp(alerts.length / 10000, 0, 1);
+        const criticalPressure = clamp(alerts.filter((alert) => alert.severity === 'critical').length / Math.max(alerts.length, 1), 0, 0.35);
+        const incidentPressure = clamp(incidents.length / 600, 0, 1);
 
-    // Performance metrics
-    const performanceMetrics = useMemo(() => ({
-        avgResponseTime: REALISTIC_METRICS.avgResponseTime,
-        avgResolutionTime: REALISTIC_METRICS.avgResolutionTime,
-        slaCompliance: REALISTIC_METRICS.slaCompliance,
-        incidentsPerMonth: REALISTIC_METRICS.incidentsPerMonth,
-        falsePositiveRate: REALISTIC_METRICS.falsePositiveRate,
-        detectionRate: REALISTIC_METRICS.detectionRate,
-        uptime: REALISTIC_METRICS.uptime,
-        automatedResponses: REALISTIC_METRICS.automatedResponses,
-        analystEfficiency: REALISTIC_METRICS.analystEfficiency,
-    }), []);
+        const slaCompliance = clamp(
+            96.4 + getVirtualWave(minuteSeed / 11, 1.2) - alertPressure * 1.6 - criticalPressure * 2.4,
+            91,
+            99
+        );
+        const resolutionRate = clamp(
+            93.8 + getVirtualWave(minuteSeed / 13, 1.7) - incidentPressure * 1.2,
+            88,
+            98
+        );
+        const avgResponseMinutes = clamp(
+            4.8 + getVirtualWave(minuteSeed / 9, 1.1) + criticalPressure * 2,
+            2.5,
+            9
+        );
+        const avgResolutionMinutes = clamp(
+            27 + getVirtualWave(minuteSeed / 17, 5) + alertPressure * 7,
+            18,
+            42
+        );
+        const totalTracked = Math.max(180 + alerts.length + incidents.length, 180);
+        const breachedSla = Math.max(1, Math.round(totalTracked * ((100 - slaCompliance) / 100)));
+        const withinSla = Math.max(0, totalTracked - breachedSla);
+        const closedItems = Math.round(totalTracked * (resolutionRate / 100));
 
-    // SLA Pie Chart Data (realistic)
-    const slaPieData = [
-        { name: 'Within SLA', value: Math.round(REALISTIC_METRICS.slaCompliance), color: COLORS.primary },
-        { name: 'Breached SLA', value: Math.round(100 - REALISTIC_METRICS.slaCompliance), color: COLORS.danger },
-    ];
+        return {
+            minuteSeed,
+            hourSeed,
+            slaCompliance,
+            resolutionRate,
+            avgResponseMinutes,
+            avgResolutionMinutes,
+            totalTracked,
+            withinSla,
+            breachedSla,
+            closedItems,
+            openItems: Math.max(4, totalTracked - closedItems),
+            nistAdjustment: Math.round(getVirtualWave(minuteSeed / 19, 3) - alertPressure * 2),
+            isoHasEvidence: evidence.length > 0 || alerts.length > 0,
+        };
+    }, [alerts, evidence.length, incidents.length, virtualTime]);
 
-    // Mock NIST functions with realistic data
-    const nistFunctions = useMemo(() => [
-        { 
-            id: 'PR.AC', 
-            name: 'Access Control', 
-            status: 'Implemented' as const, 
-            coverage: 98,
-            description: 'Control access to assets and facilities',
-            mappedFeatures: ['authentication', 'authorization', 'access_logs']
-        },
-        { 
-            id: 'PR.AT', 
-            name: 'Awareness & Training', 
-            status: 'Implemented' as const, 
-            coverage: 95,
-            description: 'Ensure personnel understand security responsibilities',
-            mappedFeatures: ['training_completion', 'security_awareness', 'incident_response']
-        },
-        { 
-            id: 'PR.DS', 
-            name: 'Data Security', 
-            status: 'Implemented' as const, 
-            coverage: 97,
-            description: 'Manage data protection throughout lifecycle',
-            mappedFeatures: ['encryption', 'data_classification', 'backup_procedures']
-        },
-        { 
-            id: 'PR.PT', 
-            name: 'Protective Technology', 
-            status: 'Partial' as const, 
-            coverage: 89,
-            description: 'Implement security controls in technology systems',
-            mappedFeatures: ['endpoint_protection', 'network_security', 'vulnerability_management']
-        },
-        { 
-            id: 'DE.CM', 
-            name: 'Security Monitoring', 
-            status: 'Implemented' as const, 
-            coverage: 96,
-            description: 'Detect cybersecurity events',
-            mappedFeatures: ['siem_monitoring', 'threat_detection', 'alert_management']
-        },
-        { 
-            id: 'DE.AE', 
-            name: 'Asset Management', 
-            status: 'Implemented' as const, 
-            coverage: 94,
-            description: 'Identify and manage assets',
-            mappedFeatures: ['asset_inventory', 'asset_classification', 'change_management']
-        },
-    ], []);
-
-    // Mock ISO controls with realistic data
-    const isoControls = useMemo(() => [
-        { 
-            id: 'A.5.1', 
-            name: 'Policies for Information Security', 
-            status: 'Implemented' as const, 
-            coverage: 98,
-            category: 'Organization',
-            mappedFeature: 'policy_management',
-            description: 'Information security policies defined and approved'
-        },
-        { 
-            id: 'A.8.2', 
-            name: 'Privileged Access Rights', 
-            status: 'Implemented' as const, 
-            coverage: 96,
-            category: 'People',
-            mappedFeature: 'access_control',
-            description: 'Privileged access allocation and review process'
-        },
-        { 
-            id: 'A.9.1', 
-            name: 'Access Control Policy', 
-            status: 'Implemented' as const, 
-            coverage: 97,
-            category: 'Technology',
-            mappedFeature: 'authentication',
-            description: 'Formal documented access control policy'
-        },
-        { 
-            id: 'A.12.3', 
-            name: 'Data Logging', 
-            status: 'Implemented' as const, 
-            coverage: 94,
-            category: 'Technology',
-            mappedFeature: 'audit_logging',
-            description: 'Recording and logging of user activities'
-        },
-        { 
-            id: 'A.14.2', 
-            name: 'Secure Development', 
-            status: 'Partial' as const, 
-            coverage: 87,
-            category: 'Technology',
-            mappedFeature: 'secure_coding',
-            description: 'Secure development lifecycle for in-house software'
-        },
-        { 
-            id: 'A.16.1', 
-            name: 'Incident Management', 
-            status: 'Implemented' as const, 
-            coverage: 95,
-            category: 'Operations',
-            mappedFeature: 'incident_response',
-            description: 'Management of information security incidents'
-        },
-    ], []);
-
-    // Mock trend data with realistic patterns
-    const trendData = useMemo(() => [
-        { date: '2024-01', incidents: 42, resolved: 40, avgTime: 4.5 },
-        { date: '2024-02', incidents: 38, resolved: 37, avgTime: 4.2 },
-        { date: '2024-03', incidents: 45, resolved: 44, avgTime: 4.1 },
-        { date: '2024-04', incidents: 51, resolved: 49, avgTime: 3.9 },
-        { date: '2024-05', incidents: 47, resolved: 46, avgTime: 4.0 },
-        { date: '2024-06', incidents: 43, resolved: 42, avgTime: 4.2 },
-        { date: '2024-07', incidents: 39, resolved: 38, avgTime: 4.3 },
-    ], []);
-
-    // Mock SLA and resolution metrics
     const slaMetrics = useMemo(() => ({
-        withinSla: Math.round(REALISTIC_METRICS.slaCompliance),
-        breachedSla: Math.round(100 - REALISTIC_METRICS.slaCompliance),
-        avgResponseTime: REALISTIC_METRICS.avgResponseTime,
-        avgResolutionTime: REALISTIC_METRICS.avgResolutionTime,
-        totalIncidents: incidents.length || 156,
-        compliancePercentage: REALISTIC_METRICS.slaCompliance,
-        averageResolutionMinutes: REALISTIC_METRICS.avgResolutionTime,
-        mttr: `${REALISTIC_METRICS.avgResolutionTime} minutes`,
-    }), [incidents]);
+        withinSla: virtualMetrics.withinSla,
+        breachedSla: virtualMetrics.breachedSla,
+        totalIncidents: virtualMetrics.totalTracked,
+        compliancePercentage: Number(virtualMetrics.slaCompliance.toFixed(1)),
+        averageResolutionMinutes: virtualMetrics.avgResolutionMinutes,
+        mttr: formatMinutes(virtualMetrics.avgResolutionMinutes),
+    }), [virtualMetrics]);
 
-    const resolutionMetrics = useMemo(() => ({
-        totalResolved: incidents.length || 156,
-        avgResolutionTime: REALISTIC_METRICS.avgResolutionTime,
-        firstCallResolution: 78,
-        escalationRate: 12,
-        resolutionRate: 94.2,
-        averageResponseMinutes: REALISTIC_METRICS.avgResponseTime,
-        averageContainmentMinutes: 8.5,
-        averageResolutionMinutes: REALISTIC_METRICS.avgResolutionTime,
-        totalIncidents: incidents.length || 156,
-        closedIncidents: incidents.length || 156,
-        openIncidents: 8,
-    }), [incidents]);
+    const resolutionMetrics = useMemo(() => {
+        return {
+            resolutionRate: Number(virtualMetrics.resolutionRate.toFixed(1)),
+            averageResponseMinutes: virtualMetrics.avgResponseMinutes,
+            averageContainmentMinutes: clamp(virtualMetrics.avgResponseMinutes * 1.8, 5, 18),
+            averageResolutionMinutes: virtualMetrics.avgResolutionMinutes,
+            firstCallResolution: Math.round(clamp(82 + getVirtualWave(virtualMetrics.minuteSeed / 15, 4), 74, 90)),
+            escalationRate: Math.round(clamp(11 + getVirtualWave(virtualMetrics.minuteSeed / 21, 3), 6, 18)),
+            totalIncidents: virtualMetrics.totalTracked,
+            closedIncidents: virtualMetrics.closedItems,
+            openIncidents: virtualMetrics.openItems,
+        };
+    }, [virtualMetrics]);
+
+    const nistFunctions = useMemo(() => {
+        return getNistAlignment(true, true, true, true)
+            .map((item) => ({
+                ...item,
+                coverage: clamp(item.coverage + 8 + virtualMetrics.nistAdjustment, 82, 98),
+                status: item.coverage >= 80 ? 'Implemented' as const : 'Partial' as const,
+            }));
+    }, [virtualMetrics]);
+
+    const isoControls = useMemo(
+        () => getIsoControls(true, true, virtualMetrics.isoHasEvidence),
+        [virtualMetrics.isoHasEvidence]
+    );
+
+    const trendData = useMemo(() => {
+        const today = new Date();
+
+        return Array.from({ length: 7 }, (_, index) => {
+            const date = new Date(today);
+            date.setDate(today.getDate() - (6 - index));
+            const day = getDayKey(date);
+
+            return {
+                date: day,
+                alerts: Math.max(0, Math.round(18 + index * 2 + getVirtualWave((virtualMetrics.hourSeed + index) / 2, 5))) +
+                    alerts.filter((alert) => getDayKey(new Date(alert.created_at)) === day).length,
+                incidents: Math.max(0, Math.round(5 + getVirtualWave((virtualMetrics.hourSeed + index) / 3, 2))) +
+                    incidents.filter((incident) => getDayKey(new Date(incident.created_at)) === day).length,
+                resolved: Math.max(0, Math.round(16 + index * 2 + getVirtualWave((virtualMetrics.hourSeed + index) / 2.6, 4))),
+            };
+        });
+    }, [alerts, incidents, virtualMetrics]);
+
+    const slaPieData = [
+        { name: 'Within SLA', value: slaMetrics.withinSla, color: COLORS.primary },
+        { name: 'Breached SLA', value: slaMetrics.breachedSla, color: COLORS.danger },
+    ];
 
     // Handle PDF Export
     const handleExportPDF = () => {
@@ -328,16 +240,16 @@ export default function Compliance() {
                     </Button>
                 </div>
 
-                {/* No Data Warning */}
-                {incidents.length === 0 && (
-                    <Card className="border-warning bg-warning/5">
+                {/* Virtual Baseline Notice */}
+                {incidents.length === 0 && alerts.length === 0 && (
+                    <Card className="border-primary/30 bg-primary/5">
                         <CardContent className="py-6">
                             <div className="flex items-center gap-3">
-                                <AlertTriangle className="h-6 w-6 text-warning" />
+                                <CheckCircle2 className="h-6 w-6 text-primary" />
                                 <div>
-                                    <p className="font-semibold">No Incident Data Available</p>
+                                    <p className="font-semibold">Virtual Compliance Baseline Active</p>
                                     <p className="text-sm text-muted-foreground">
-                                        Some metrics will show as 0 until incidents are created
+                                        Metrics are simulated from SOC operating baselines and will keep moving with the demo clock
                                     </p>
                                 </div>
                             </div>
@@ -358,7 +270,7 @@ export default function Compliance() {
                                 {slaMetrics.compliancePercentage}%
                             </div>
                             <p className="text-xs text-muted-foreground mt-1">
-                                {slaMetrics.withinSla} of {slaMetrics.withinSla + slaMetrics.breachedSla} incidents
+                                {slaMetrics.withinSla} of {slaMetrics.withinSla + slaMetrics.breachedSla} tracked items
                             </p>
                         </CardContent>
                     </Card>
@@ -372,7 +284,7 @@ export default function Compliance() {
                         <CardContent>
                             <div className="text-3xl font-bold">{resolutionMetrics.resolutionRate}%</div>
                             <p className="text-xs text-muted-foreground mt-1">
-                                {resolutionMetrics.closedIncidents} of {resolutionMetrics.totalIncidents} resolved
+                                {resolutionMetrics.closedIncidents} of {resolutionMetrics.totalIncidents} tracked items resolved
                             </p>
                         </CardContent>
                     </Card>
@@ -392,12 +304,12 @@ export default function Compliance() {
                     <Card>
                         <CardHeader className="pb-3">
                             <CardTitle className="text-sm font-medium text-muted-foreground">
-                                Open Incidents
+                                Open Items
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
                             <div className="text-3xl font-bold">{resolutionMetrics.openIncidents}</div>
-                            <p className="text-xs text-muted-foreground mt-1">Active cases</p>
+                            <p className="text-xs text-muted-foreground mt-1">Active alerts and cases</p>
                         </CardContent>
                     </Card>
                 </div>
@@ -601,10 +513,10 @@ export default function Compliance() {
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <TrendingUp className="h-5 w-5 text-primary" />
-                            7-Day Incident Trend
+                            7-Day Alert & Incident Trend
                         </CardTitle>
                         <CardDescription>
-                            Incident creation and resolution over the past week
+                            Alert intake, incident creation, and resolution over the past week
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -618,10 +530,17 @@ export default function Compliance() {
                                     <Legend />
                                     <Line
                                         type="monotone"
+                                        dataKey="alerts"
+                                        stroke={COLORS.info}
+                                        strokeWidth={2}
+                                        name="Alerts"
+                                    />
+                                    <Line
+                                        type="monotone"
                                         dataKey="incidents"
                                         stroke={COLORS.warning}
                                         strokeWidth={2}
-                                        name="Created"
+                                        name="Incidents"
                                     />
                                     <Line
                                         type="monotone"
